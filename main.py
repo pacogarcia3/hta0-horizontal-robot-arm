@@ -45,5 +45,5 @@ def ImageDetection():
 
 
 #RunTests()
-RunPickandPlace()
-#ImageDetection()
+#RunPickandPlace()
+ImageDetection()

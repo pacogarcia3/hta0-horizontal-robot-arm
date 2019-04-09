@@ -15,15 +15,36 @@ writeValues=False
 
 #test camera calibration against all points, calculating XYZ
 
+#load camera calibration
+savedir="camera_data/"
+cam_mtx=np.load(savedir+'cam_mtx.npy')
+dist=np.load(savedir+'dist.npy')
+newcam_mtx=np.load(savedir+'newcam_mtx.npy')
+roi=np.load(savedir+'roi.npy')
 
-#[x,y,z] 7 World / Object points
-#corner of paper = 0,0
 
+#load center points from New Camera matrix
+cx=newcam_mtx[0,2]
+cy=newcam_mtx[1,2]
+fx=newcam_mtx[0,0]
+print("cx: "+str(cx)+",cy "+str(cy)+",fx "+str(fx))
 
 
 #MANUALLY INPUT YOUR MEASURED POINTS HERE
+#ENTER (X,Y,d*)
+#d* is the distance from your point to the camera lens. (d* = Z for the camera center)
+#we will calculate Z in the next steps after extracting the new_cam matrix
 
-worldPoints=np.array([[5.5,3.9,46.8],
+
+#world center + 9 world points
+
+total_points_used=10
+
+X_center=10.9
+Y_center=10.7
+Z_center=43.4
+worldPoints=np.array([[X_center,Y_center,Z_center],
+                       [5.5,3.9,46.8],
                        [14.2,3.9,47.0],
                        [22.8,3.9,47.4],
                        [5.5,10.6,44.2],
@@ -35,8 +56,9 @@ worldPoints=np.array([[5.5,3.9,46.8],
 
 #MANUALLY INPUT THE DETECTED IMAGE COORDINATES HERE
 
-#[u,v] 7 Image points
-imagePoints=np.array([[502,185],
+#[u,v] center + 9 Image points
+imagePoints=np.array([[cx,cy],
+                       [502,185],
                        [700,197],
                        [894,208],
                        [491,331],
@@ -47,22 +69,20 @@ imagePoints=np.array([[502,185],
                        [900,508]], dtype=np.float32)
 
 
+#FOR REAL WORLD POINTS, CALCULATE Z from d*
 
+for i in range(1,total_points_used):
+    #start from 1, given for center Z=d*
+    #to center of camera
+    wX=worldPoints[i,0]-X_center
+    wY=worldPoints[i,1]-Y_center
+    wd=worldPoints[i,2]
 
+    d1=np.sqrt(np.square(wX)+np.square(wY))
+    wZ=np.sqrt(np.square(wd)-np.square(d1))
+    worldPoints[i,2]=wZ
 
-#load camera matrix
-savedir="camera_data/"
-
-cam_mtx=np.load(savedir+'cam_mtx.npy')
-dist=np.load(savedir+'dist.npy')
-newcam_mtx=np.load(savedir+'newcam_mtx.npy')
-roi=np.load(savedir+'roi.npy')
-
-
-cx=newcam_mtx[0,2]
-cy=newcam_mtx[1,2]
-fx=newcam_mtx[0,0]
-print("cx: "+str(cx)+",cy "+str(cy)+",fx "+str(fx))
+print(worldPoints)
 
 
 #print(ret)
@@ -115,13 +135,12 @@ if writeValues==True: np.save(savedir+'P_mtx.npy', P_mtx)
 
 #LETS CHECK THE ACCURACY HERE
 
-upper_lim=9
 
 s_arr=np.array([0], dtype=np.float32)
-s_describe=np.array([0,0,0,0,0,0,0,0,0],dtype=np.float32)
+s_describe=np.array([0,0,0,0,0,0,0,0,0,0],dtype=np.float32)
 
-for i in range(0,upper_lim):
-    print("=======POINT # " + str(i+1) +" =========================")
+for i in range(0,total_points_used):
+    print("=======POINT # " + str(i) +" =========================")
     
     print("Forward: From World Points, Find Image Pixel")
     XYZ1=np.array([[worldPoints[i,0],worldPoints[i,1],worldPoints[i,2],1]], dtype=np.float32)
@@ -137,7 +156,7 @@ for i in range(0,upper_lim):
     print(uv1)
     print(">==> s - Scaling Factor")
     print(s)
-    s_arr=np.array([s/9+s_arr[0]], dtype=np.float32)
+    s_arr=np.array([s/total_points_used+s_arr[0]], dtype=np.float32)
     s_describe[i]=s
     if writeValues==True: np.save(savedir+'s_arr.npy', s_arr)
 
@@ -175,7 +194,7 @@ print("Std: " + str(s_std))
 
 print(">>>>>> S Error by Point")
 
-for i in range(0,upper_lim):
-    print("Point "+str(i+1))
+for i in range(0,total_points_used):
+    print("Point "+str(i))
     print("S: " +str(s_describe[i])+" Mean: " +str(s_mean) + " Error: " + str(s_describe[i]-s_mean))
 
