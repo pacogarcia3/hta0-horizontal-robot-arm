@@ -151,7 +151,7 @@ for i in range(0,upper_lim):
     print("//-- suv1")
     print(suv_1)
 
-    print("      get camera coordinates, multply by inverse Camera Matrix, subtract tvec1")
+    print("get camera coordinates, multiply by inverse Camera Matrix, subtract tvec1")
     xyz_c=inverse_newcam_mtx.dot(suv_1)
     xyz_c=xyz_c-tvec1
     print("      xyz_c")
