@@ -30,6 +30,8 @@ Read about the process to calibrate the camera here: https://www.fdxlabs.com/cal
 
 **arduino_sketch** contains the arduino sketch that controls the arm.  This folder also contains the formulas used to translate desired Y, Z position into servo angles.
 
+Read about the calculation of desired Y, Z position here: https://www.fdxlabs.com/converting-y-z-coordinates-into-angles-for-a-two-axis-robot-arm/
+
 **commands_arduino.py** is where the most commonly used operations of the arm are defined for easy reference from the main_loop.py.
 
 ## Running the Program
