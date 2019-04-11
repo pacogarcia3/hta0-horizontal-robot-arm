@@ -127,11 +127,11 @@ void loop() {
 
 void get_angles_from_yz(double y, double z) {
 
-  //refer to trigonometry illustrationn for variable description
+  //refer to trigonometry illustration for variable description
 
   double H, s1, s2, aB, aA, aQ, servo1angle, servo2angle, y2, z2, y3, z3;
 
-  //arm lenght in cm
+  //arm length in cm
   int L = 13;
 
   H= sqrt (pow(y,2) + pow(z,2));
@@ -168,7 +168,7 @@ void get_angles_from_yz(double y, double z) {
 
 
   //Convert to SERVO Angle
-  //in this case, a 90 servo position is equal to 71 degress for Top arm
+  //in this case, a 90 servo position is equal to 71 degrees for Top arm
   //90 servo position is equal to 65 Middle Arm
   angle_next[0] = angle_next[0] + calibrate_TopArm;
   angle_next[1] = angle_next[1] + calibrate_MiddleArm;
